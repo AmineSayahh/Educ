@@ -1,21 +1,54 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [msg, setMsg] = useState('');
 
   const handleSubmit = (event) => {
-    event.preventDefault(); // Empêche la soumission par défaut du formulaire
+    event.preventDefault();
 
-    const form = event.target;
-    if (form.checkValidity()) {
-      // Si tous les champs sont valides, effectuer l'action de connexion
-      console.log("Form is valid. Proceed with login.");
-    } else {
-      // Si des champs sont invalides, affichez les messages de validation
-      form.reportValidity();
-    }
+    axios.post("http://localhost:4500/api/login", {
+      email: email,
+      password: password
+    }).then((res) => {
+      if (res.data.token) {
+        // Save the token in localStorage
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userId", res.data.id);
+
+        console.log(res);
+
+        // Extract user information from the response
+        const userRole = res.data.__t;
+
+        // Save the user role in localStorage if needed
+        localStorage.setItem("USER_ROLE", userRole);
+
+        // Redirect based on user role
+        if (userRole === "Eleve") {
+          window.location.href = "/DashboardEnseignant";
+        } else if (userRole === "admin") {
+          window.location.href = "/dashboard";
+        } else if (userRole === "Enseignant") {
+          //localStorage.setItem("idAdmin", res.data.data.user.idAdministration);
+          //localStorage.setItem("idUserr", res.data.data.user._id);
+          localStorage.setItem("USER_ROLE", res.data.__t);
+          window.location.href = "/DashboardEnseignant";
+        } else {
+          setMsg("email or password is invalid");
+        }
+      } else {
+        alert('Verifier vos coordonnées');
+      }
+    }).catch((err) => {
+      console.error(err);
+      setMsg("An error occurred while logging in.");
+    });
   };
 
   const togglePasswordVisibility = () => {
@@ -40,6 +73,8 @@ export default function Login() {
               type="email"
               placeholder="Email"
               className="block text-sm py-3 px-4 rounded-lg w-full border outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
             <div className="relative">
@@ -47,6 +82,8 @@ export default function Login() {
                 type={passwordVisible ? "text" : "password"}
                 placeholder="Mot de passe"
                 className="block text-sm py-3 px-4 rounded-lg w-full border outline-none"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
               />
@@ -58,6 +95,7 @@ export default function Login() {
                 <FontAwesomeIcon icon={passwordVisible ? faEyeSlash : faEye} />
               </button>
             </div>
+            {msg && <p className="text-red-500 text-sm">{msg}</p>}
             <div className="text-center mt-6">
               <button
                 type="submit"

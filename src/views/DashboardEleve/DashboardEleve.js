@@ -42,89 +42,62 @@ const slides = [
 class DashboardEleve extends Component {
   state = {
     personnes: [],
-    DateDeCreation: "",
-    Contenu: "",
-    Files: null,
-    long: "",
-    title : "",
-    description : ""
-
+    title: "",
+    description: "",
   };
 
   componentDidMount() {
-    this.getusers();
-
+    this.getUsers();
   }
 
   envoyer() {
-    // Log the state values for debugging
     console.log('title', this.state.title);
     console.log('description', this.state.description);
     
-    // Retrieve token from localStorage
     const token = localStorage.getItem('token');
-  
-    // Create the payload object
     const payload = {
       title: this.state.title,
       description: this.state.description
     };
   
-    // Configure axios request with Authorization header
-    axios.post(`http://localhost:4000/api/posts`, payload, {
+    axios.post('http://localhost:4500/api/posts', payload, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
     .then(res => {
-      console.log('dataaaaaaaaaaaaaaaaaaaaaa', res);
-      console.log(res.status)
+      console.log('data', res);
       if (res.status === 200) {
-        alert('Publication est ajouté');
+        alert('Publication est ajoutée');
       }
       window.location.reload();
-      // window.location.href='/sidebar'
     })
     .catch((err) => {
       console.log(err);
     });
   }
-        getusers() {
-          const token = localStorage.getItem('token');
 
-    axios.get(`http://http://localhost:4000/api/posts/`,{
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  }).then((res => {
-      this.setState({ personnes: res.data.data })
-      console.log('personnes', this.state.personnes)
-      this.setState({ long: res.data.data.length })
-    }))
-
+  getUsers() {
+    const token = localStorage.getItem('token');
+  
+    axios.get('http://localhost:4500/api/posts', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((res) => {
+      this.setState({ personnes: res.data });
+      console.log('personnes', this.state.personnes);
+    }).catch((err) => {
+      console.log(err);
+    });
   }
-  // deleteUser=(userId)=>{
-  //     axios.delete('http://localhost:5000/users/DelUser/')
-  //     console.log('userid ',userId)
-  //    this.getusers();
-  // }
-  // UpdateUser(id) {
-  //     localStorage.setItem("idPerson", id);
-  //     console.log("idPerson ", localStorage.getItem("idPerson"));
-  //     window.location.href = "/update";
-  //   }
 
   render() {
-
     return (
-
       <>
-        <CRow>
-
-
-
+<CRow>
           <CCol xxxxs="0.000000000000000000000000000000000000000000000000000000000000001" xxxxl="0.000000000000000000000000000000000000000000000000000000000000001">
             <CCard>
               {/* <CCardHeader>
@@ -173,108 +146,61 @@ class DashboardEleve extends Component {
             </CCard>
           </CCol>
         </CRow>
-        <CCardHeader>     <CCardHeader>
-          <h4>Publications</h4>
+        <CCardHeader>
+          <h4>Publications Administratives</h4>
         </CCardHeader>
-          <CCardBody>
-
-            <CForm action="" method="post" encType="multipart/form-data" className="form-horizontal">
-              <CFormGroup row>
-                <CCol md="3">
-                  <CLabel htmlFor="company">Titre</CLabel>
-                </CCol>
-                <CCol xs="1" md="9">
-                  <CInput id="company" placeholder="Titre" onChange={event => this.setState({ title: event.target.value })} />
-
-                </CCol>
-              </CFormGroup>
-              <CFormGroup row>
-                <CCol md="3">
-                  <CLabel htmlFor="description">Description</CLabel>
-                </CCol>
-                <CCol xs="1" md="9">
-                  <CInput id="description" placeholder="Quoi de neuf ?" onChange={event => this.setState({ description: event.target.value })} />
-
-                </CCol>
-              </CFormGroup>
-
-            </CForm>
-
-            {/* <CRow className="align-items-center">
-          <CCol col="1" sm="1" md="1" xl className="mb-3 mb-xl-0">
-          <CButton color="success" block type="submit" onClick={()=>{this.envoyer()}}>Ajouter Publication </CButton>
-            </CCol>
-            </CRow> */}
-
-          </CCardBody>
-          <CRow>
-            <CCardHeader> <CCardBody>
-              <CCol col="2" className="text-center mt-3">
-                <CButton color="btn btn-light" block type="submit" onClick={() => { this.envoyer() }}>
-                  Ajouter Publication              </CButton>
+        <CCardBody>
+          <CForm action="" method="post" encType="multipart/form-data" className="form-horizontal">
+            <CFormGroup row>
+              <CCol md="3">
+                <CLabel htmlFor="company">Titre</CLabel>
               </CCol>
-            </CCardBody>
-            </CCardHeader>
-          </CRow>
-        </CCardHeader>
-
-        <br />
-        <br />
-
-        {this.state.personnes.map((item, index) => (
+              <CCol xs="12" md="9">
+                <CInput id="company" placeholder="Titre" onChange={event => this.setState({ title: event.target.value })} />
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="3">
+                <CLabel htmlFor="description">Description</CLabel>
+              </CCol>
+              <CCol xs="12" md="9">
+                <CInput id="description" placeholder="Quoi de neuf ?" onChange={event => this.setState({ description: event.target.value })} />
+              </CCol>
+            </CFormGroup>
+          </CForm>
           <CRow>
+            <CCol className="text-center mt-3">
+              <CButton color="btn btn-light" block onClick={() => { this.envoyer() }}>
+                Ajouter Publication
+              </CButton>
+            </CCol>
+          </CRow>
+        </CCardBody>
+        {this.state.personnes.map((item, index) => (
+          <CRow key={index}>
             <CCol>
-
               <CCard>
-
-                <CCardHeader> 
-               
-                  <div style={{float: "right"}}>
-                  <td>
+                <CCardHeader>
+                  <div style={{ float: "right" }}>
                     <CLink to="/matiere/UpdateActivite">
                       <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
                         <CIcon name="cilCheck" active block shape="pill" color="info" aria-pressed="true"
                           onClick={evt => this.handleClickEdit(evt, item._id)} />
-
                       </CCol>
                     </CLink>
-                  </td>
-
-                  <td>
-                    <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
+                    <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
                       <CIcon name="cilX" active block shape="pill" color="info" aria-pressed="true"
                         onClick={evt => this.HandleclickDelete(evt, item._id)} />
-
                     </CCol>
-                  </td>
                   </div>
-                  <h4>Publication</h4>
+                  <h4>Publication Administratives</h4>
                 </CCardHeader>
                 <CCardBody>
                   <CJumbotron fluid>
                     <CContainer fluid>
-                      <tbody>
-
-                        <tr key={index}>
-
-                          <h5>{item.Contenu}</h5>
-                          <br />
-
-                          <br />
-                          {/* Date :   <p>{item.DateDeCreation}</p>  */}
-                          {/* <p>{item.Files}</p>  */}
-                          <img src={`http://localhost:8000/getfile/${item.photo}`} style={{ "height": "250px", "width": "700px" }} download />
-
-                          <br />
-                          <br />
-                          Date :   <p>{item.DateDeCreation}</p>
-                        </tr>
-
-
-
-                      </tbody>
-
-
+                      <h5>{item.title}</h5>
+                      <p>{item.description}</p>
+                      <p>Date: {new Date(item.createdAt).toLocaleDateString()}</p>
                     </CContainer>
                   </CJumbotron>
                 </CCardBody>
@@ -283,7 +209,7 @@ class DashboardEleve extends Component {
           </CRow>
         ))}
       </>
-    )
+    );
   }
 }
 
@@ -314,7 +240,7 @@ export default DashboardEleve;
 // } from '@coreui/react'
 // import CIcon from '@coreui/icons-react'
 
-// import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } 
+// import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table }
 // from 'reactstrap';
 // let prev  = 0;
 // let next  = 0;
@@ -452,7 +378,7 @@ export default DashboardEleve;
 //         <CCard>
 
 //               <CardHeader>
-//                 <i className="fa fa-align-justify"></i> 
+//                 <i className="fa fa-align-justify"></i>
 //             Publications Administratives
 //               </CardHeader>
 //               <CardBody>
@@ -469,11 +395,11 @@ export default DashboardEleve;
 //                                  currentTodos.map((item,index) =>{
 //                                     return(
 
-//                                       <tr 
+//                                       <tr
 //                                       key={index}>
-//                                           <p>{item.Contenu}</p> 
-//                                           <p>{item.DateDeCreation}</p> 
-//                                           <p>{item.Files}</p> 
+//                                           <p>{item.Contenu}</p>
+//                                           <p>{item.DateDeCreation}</p>
+//                                           <p>{item.Files}</p>
 
 //                                             {/* <td>
 
@@ -495,7 +421,7 @@ export default DashboardEleve;
 //                                      {/* <td>
 //                                      <CLink to="/MesEnseignants/MesEnseignants">
 //                 <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-//                 <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+//                 <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 //                  type="submit"  onClick={()=>{this.envoyer2()}}
 //             </CCol>
 //             </CLink>
@@ -505,7 +431,7 @@ export default DashboardEleve;
 //                     //                           <td>
 //                     //                           <CLink to="/Dashboard">
 //                     //      <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-//                     //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+//                     //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 //                     //       {/* type="submit"  onClick={()=>{this.envoyer2()}} */}
 //                     //  </CCol>
 //                     //  </CLink>
@@ -568,9 +494,9 @@ export default DashboardEleve;
 //                     <CLabel htmlFor="textarea-input">Ecrivez ...</CLabel>
 //                   </CCol>
 //                   <CCol xs="12" md="9">
-//                     <CTextarea 
-//                       name="textarea-input" 
-//                       id="textarea-input" 
+//                     <CTextarea
+//                       name="textarea-input"
+//                       id="textarea-input"
 //                       rows="9"
 //                       placeholder="Content..." onChange={event=>this.setState({Contenu:event.target.value})}
 //                     />
@@ -594,7 +520,7 @@ export default DashboardEleve;
 //         </CCardBody>
 //         </CCardHeader>
 
-//         </CCard>   
+//         </CCard>
 
 //     )
 // }}
@@ -626,7 +552,7 @@ export default DashboardEleve;
 // // } from '@coreui/react'
 
 
-// // import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } 
+// // import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table }
 // // from 'reactstrap';
 // // import CIcon from '@coreui/icons-react'
 
@@ -1169,11 +1095,11 @@ export default DashboardEleve;
 // //     </>
 // //   )
 // // }
-// // <div> 
+// // <div>
 // // <CCard>
 
 // //       <CardHeader>
-// //         <i className="fa fa-align-justify"></i> 
+// //         <i className="fa fa-align-justify"></i>
 // //     Publications Administratives
 // //       </CardHeader>
 // //       <CardBody>
@@ -1190,11 +1116,11 @@ export default DashboardEleve;
 // //                          currentTodos.map((item,index) =>{
 // //                             return(
 
-// //                               <tr 
+// //                               <tr
 // //                               key={index}>
-// //                                   <p>{item.Contenu}</p> 
-// //                                   <p>{item.DateDeCreation}</p> 
-// //                                   <p>{item.Files}</p> 
+// //                                   <p>{item.Contenu}</p>
+// //                                   <p>{item.DateDeCreation}</p>
+// //                                   <p>{item.Files}</p>
 
 // //                                     {/* <td>
 
@@ -1216,7 +1142,7 @@ export default DashboardEleve;
 // //                              {/* <td>
 // //                              <CLink to="/MesEnseignants/MesEnseignants">
 // //         <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-// //         <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+// //         <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 // //          type="submit"  onClick={()=>{this.envoyer2()}}
 // //     </CCol>
 // //     </CLink>
@@ -1226,7 +1152,7 @@ export default DashboardEleve;
 // //             //                           <td>
 // //             //                           <CLink to="/Dashboard">
 // //             //      <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-// //             //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+// //             //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 // //             //       {/* type="submit"  onClick={()=>{this.envoyer2()}} */}
 // //             //  </CCol>
 // //             //  </CLink>
@@ -1289,9 +1215,9 @@ export default DashboardEleve;
 // //             <CLabel htmlFor="textarea-input">Ecrivez ...</CLabel>
 // //           </CCol>
 // //           <CCol xs="12" md="9">
-// //             <CTextarea 
-// //               name="textarea-input" 
-// //               id="textarea-input" 
+// //             <CTextarea
+// //               name="textarea-input"
+// //               id="textarea-input"
 // //               rows="9"
 // //               placeholder="Content..." onChange={event=>this.setState({Contenu:event.target.value})}
 // //             />
@@ -1305,12 +1231,12 @@ export default DashboardEleve;
 // //             </CInputGroupPrepend>
 // //             <CInput type="text" placeholder="Date de creation" autoComplete="DateDeCreation" onChange={event=>this.setState({DateDeCreation:event.target.value})}></CInput>
 // //           </CInputGroup> */}
-// //         {/* <CInputGroup  className="mb-3">  
+// //         {/* <CInputGroup  className="mb-3">
 
 // //           <CInputGroupPrepend><label for="Télécharger Un Fichier">Télécharger un fichier : .. </label>
 
 // //    <input type="file" placeholder="Télécharger un fichier"    onChange={event=>this.setState({Files:event.target.files[0]})} />
-// //    </CInputGroupPrepend>  
+// //    </CInputGroupPrepend>
 // //     </CInputGroup > */}
 // //          <CFormGroup row>
 // //           <CLabel col md="3" htmlFor="file-input">Ajouter des fichier à votre publication</CLabel>
@@ -1329,7 +1255,7 @@ export default DashboardEleve;
 // // </CCardBody>
 // // </CCardHeader>
 
-// // </CCard>   
+// // </CCard>
 // // </div>
 
 // // export default Dashboard

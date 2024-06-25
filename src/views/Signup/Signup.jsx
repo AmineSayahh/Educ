@@ -1,18 +1,46 @@
-import { useHistory, Link } from "react-router-dom";   
-import React from "react";
+import React, { useState } from "react";
+import { useHistory, Link } from "react-router-dom";
+import axios from "axios";
 
 export default function Signup() {
-  const history = useHistory(); 
+  const history = useHistory();
+  const [formData, setFormData] = useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleSubmit = (event) => {
-    event.preventDefault(); 
-    const form = event.target;
-    if (form.checkValidity()) {
-     
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:4500/api/users", {
+        nom: formData.nom,
+        prenom: formData.prenom,
+        email: formData.email,
+        password: formData.password,
+        repeat_password : formData.password
+      });
+
+      console.log("Response:", response);
+
+      // Assuming successful registration redirects to login page
       history.push("/login");
-    } else {
-     
-      form.reportValidity();
+    } catch (error) {
+      console.error("Error registering user:", error);
+      // Handle error, show user-friendly message if needed
     }
   };
 
@@ -34,32 +62,47 @@ export default function Signup() {
             <div className="space-y-4">
               <input
                 type="text"
+                name="nom"
                 placeholder="Nom"
                 className="block text-sm py-3 px-4 rounded-lg w-full border outline-none"
+                value={formData.nom}
+                onChange={handleChange}
                 required
               />
               <input
                 type="text"
+                name="prenom"
                 placeholder="Prenom"
                 className="block text-sm py-3 px-4 rounded-lg w-full border outline-none"
+                value={formData.prenom}
+                onChange={handleChange}
                 required
               />
               <input
                 type="email"
+                name="email"
                 placeholder="Email"
                 className="block text-sm py-3 px-4 rounded-lg w-full border outline-none"
+                value={formData.email}
+                onChange={handleChange}
                 required
               />
               <input
                 type="password"
+                name="password"
                 placeholder="Password"
                 className="block text-sm py-3 px-4 rounded-lg w-full border outline-none"
+                value={formData.password}
+                onChange={handleChange}
                 required
               />
               <input
                 type="password"
+                name="confirmPassword"
                 placeholder="Confirm password"
                 className="block text-sm py-3 px-4 rounded-lg w-full border outline-none"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -72,7 +115,10 @@ export default function Signup() {
                 Inscription
               </button>
               <p className="mt-4 text-sm">
-                Vous avez déjà un compte ? <Link to="/login" className="text-green-800 font-bold">Connexion</Link>
+                Vous avez déjà un compte ?{" "}
+                <Link to="/login" className="text-green-800 font-bold">
+                  Connexion
+                </Link>
               </p>
             </div>
           </form>

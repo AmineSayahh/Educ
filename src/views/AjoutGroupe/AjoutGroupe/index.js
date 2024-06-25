@@ -42,11 +42,9 @@ class  AjoutGroupe extends Component {
   envoyer(){
     const data ={NomDeGroupe:this.state.NomDeGroupe, Abbreviation:this.state.Abbreviation}
   
+
     
-  
-  
-    
-    axios.put("http://localhost:8000/Groupe/addGroupe/6089f2d2eb005b152048e5b6",data)
+    axios.post("http://localhost:4500/creation",data)
          
       
       .then(res=>{

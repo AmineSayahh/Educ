@@ -95,7 +95,7 @@ class  NGroupe  extends Component {
   
   
     
-    axios.post(`http://localhost:8000/Groupe/addGroupe/${localStorage.getItem('idUser')}`,data)
+    axios.post(`http://localhost:4500/api/creation`,data)
 
       
       .then((res)=>{

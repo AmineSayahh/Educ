@@ -40,7 +40,7 @@ class TEtudiants extends Component {
     }
     
     getusers(){
-        axios.get(`http://localhost:8000/Etudiant/getAllETD/${localStorage.getItem("idUser")}/${localStorage.getItem('idG')}`).then((res=>{
+        axios.get(`http://localhost:4500/Etudiant/getAllETD/${localStorage.getItem("idUser")}/${localStorage.getItem('idG')}`).then((res=>{
             this.setState({personnes:res.data.data})
             console.log('personnes',this.state.personnes)
         }))
