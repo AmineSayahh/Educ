@@ -1,15 +1,17 @@
 import React, { useState } from "react";
+import axios from "axios"; // Import Axios library
 
 const NVTest = () => {
   const [questions, setQuestions] = useState([
     {
       id: 1,
       question: "",
-      options: ["", "", "" , ""],
+      options: ["", "", "", ""],
       selectedOption: null,
     },
   ]);
   const [submitted, setSubmitted] = useState(false);
+  const [specialite, setSpecialite] = useState(""); // Add a state for specialite
 
   const handleQuestionChange = (index, value) => {
     const newQuestions = [...questions];
@@ -41,16 +43,43 @@ const NVTest = () => {
     ]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSpecialiteChange = (e) => {
+    setSpecialite(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const jsonData = JSON.stringify(questions, null, 2);
-    const blob = new Blob([jsonData], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "test_questions.json";
-    a.click();
-    setSubmitted(true);
+
+    const transformedQuestions = questions.map(({ question, options, selectedOption }) => {
+      const reponse = options.reduce((acc, option, index) => {
+        acc[option] = index === selectedOption;
+        return acc;
+      }, {});
+      
+      return { question, reponse };
+    });
+
+    const data = {
+      model: transformedQuestions,
+      specialite,
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post("http://localhost:4500/api/createTest", data, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Response from server:", response.data); // Handle response as needed
+
+      setSubmitted(true); // Assuming submission was successful
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle errors here
+    }
   };
 
   return (
@@ -61,12 +90,24 @@ const NVTest = () => {
           <p className="text-green-500 text-lg mb-6 text-center">Vos questions ont été soumises avec succès !</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="mb-4">
+              <label className="block text-white mb-2" htmlFor="specialite">Spécialité</label>
+              <input
+                type="text"
+                id="specialite"
+                value={specialite}
+                onChange={handleSpecialiteChange}
+                className="w-full p-2 rounded-lg"
+                style={{ color: "black" }}
+                placeholder="Écrire la spécialité ici"
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {questions.map(({ id, question, options, selectedOption }, questionIndex) => (
                 <div key={id} className="bg-gray-700 p-4 rounded-lg">
                   <input
                     type="text"
-                    style={{color : "black"}}
+                    style={{ color: "black" }}
                     placeholder="Écrire la question ici"
                     value={question}
                     onChange={(e) => handleQuestionChange(questionIndex, e.target.value)}
@@ -75,7 +116,7 @@ const NVTest = () => {
                   {options.map((option, optionIndex) => (
                     <div key={optionIndex} className="flex items-center mb-2 text-white">
                       <input
-                        type="checkbox"
+                        type="radio" // Assuming it's a radio button for selecting options
                         name={`question-${questionIndex}`}
                         checked={selectedOption === optionIndex}
                         onChange={() => handleOptionSelect(questionIndex, optionIndex)}
@@ -83,7 +124,7 @@ const NVTest = () => {
                       />
                       <input
                         type="text"
-                        style={{color : "black"}}
+                        style={{ color: "black" }}
                         placeholder="Écrire l'option ici"
                         value={option}
                         onChange={(e) => handleOptionChange(questionIndex, optionIndex, e.target.value)}
@@ -96,7 +137,7 @@ const NVTest = () => {
             </div>
             <button
               type="button"
-              style={{backgroundColor : "blue"}}
+              style={{ backgroundColor: "blue" }}
               onClick={addQuestion}
               className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-400 transition-colors block mx-auto mb-6"
             >

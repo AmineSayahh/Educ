@@ -32,42 +32,42 @@ import image from './aa.jpg'
 }
 login(event) {
     
-axios.post("http://localhost:4000/api/login",{
+axios.post("http://localhost:4500/api/login",{
 
 email:this.state.email,
 password:this.state.password
 
 }).then((res) => {
   console.log('status',res.data)
-// if(res.data.token){
-//   if(res.data.__t==="Eleve"){
-//     localStorage.setItem("USER_ROLE", res.data.__t);
-//     window.location.href="#/DashboardEnseignant"
-//   }
+if(res.data.token){
+  if(res.data.__t==="Eleve"){
+    localStorage.setItem("USER_ROLE", res.data.__t);
+    window.location.href="#/DashboardEnseignant"
+  }
   
-//   else if (res.data.data.user.__t==="Enseignant"){
-//     localStorage.setItem("idAdmin",res.data.data.user.idAdministration)
-//     console.log("ffffffffffffffffffffffffff",res.data.data.user.idAdministration)
-//     localStorage.setItem("idUserr",res.data.data.user._id)
-//     localStorage.setItem("USER_ROLE", res.data.data.user.__t);
-//     console.log('USER_ROLE',localStorage.getItem('USER_ROLE'));
-//     console.log('type',res.data.data__t);
-//     window.location.href="#/DashboardEnseignant"
+  else if (res.data.data.user.__t==="Enseignant"){
+    localStorage.setItem("idAdmin",res.data.data.user.idAdministration)
+    console.log("ffffffffffffffffffffffffff",res.data.data.user.idAdministration)
+    localStorage.setItem("idUserr",res.data.data.user._id)
+    localStorage.setItem("USER_ROLE", res.data.data.user.__t);
+    console.log('USER_ROLE',localStorage.getItem('USER_ROLE'));
+    console.log('type',res.data.data__t);
+    window.location.href="#/DashboardEnseignant"
 
-//   }else if (res.data.__t==="admin"){
+  }else if (res.data.__t==="admin"){
     
-//     // localStorage.setItem("idUser",res.data.data.user._id)
-//     // localStorage.setItem("USER_ROLE", res.data.data.user.__t);
+    // localStorage.setItem("idUser",res.data.data.user._id)
+    // localStorage.setItem("USER_ROLE", res.data.data.user.__t);
 
-//     window.location.href="#/dashboard"
+    window.location.href="#/dashboard"
 
-//   }
+  }
 
-//   else{
+  else{
     
-//     this.setState({msg:"email or password in valid"})
-//   }
-// }
+    this.setState({msg:"email or password in valid"})
+  }
+}
 if (res.data.token) {
   // Save the token in localStorage
   localStorage.setItem("token", res.data.token);
@@ -78,14 +78,14 @@ if (res.data.token) {
   // Save the user role in localStorage if needed
   localStorage.setItem("USER_ROLE", userRole);
 
-  // Redirect based on user role
-  // if (userRole === "Eleve") {
-  //   window.location.href = "#/DashboardEnseignant";
-  // } else if (userRole === "admin") {
-  //   window.location.href = "#/dashboard";
-  // } else {
-  //   this.setState({ msg: "email or password is invalid" });
-  // }
+  //Redirect based on user role
+  if (userRole === "Eleve") {
+    window.location.href = "#/DashboardEnseignant";
+  } else if (userRole === "admin") {
+    window.location.href = "#/dashboard";
+  } else {
+    this.setState({ msg: "email or password is invalid" });
+  }
 } else {
   alert('Verifier vos coordonnées');
 }

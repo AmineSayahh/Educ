@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
-import axios from "axios" ;
-import { Link } from 'react-router-dom'
+import React, { Component } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 import {
   CButton,
   CCard,
@@ -13,121 +13,97 @@ import {
   CInputGroup,
   CInputGroupPrepend,
   CInputGroupText,
-  CRow,
-  CLink
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
+  CRow
+} from '@coreui/react';
+import CIcon from '@coreui/icons-react';
 
-
-
- class LoginSuperAdmin extends Component {
+class LoginSuperAdmin extends Component {
   constructor(props) {
-    super(props )
+    super(props);
     this.state = {
-  
-        email: '',
-        mdp: '',
-       
-}
-}
-LoginSuperAdmin(event) {
-    
-axios.post("http://localhost:8000/User/authuser",{
-
-email:this.state.email,
-mdp:this.state.mdp
-
-}).then((res) => {
-  console.log('status',res.data.status)
-if(res.data.status==='success'){
-  if(res.data.data.user.__t==="SuperAdmin"){
-    localStorage.setItem("USER_ROLE", res.data.data.user.__t);
-    localStorage.setItem("idUsseer",res.data.data.user._id);
-    window.location.href="#/HomeSuper"
+      email: '',
+      mdp: '',
+      msg: ''
+    };
   }
 
-  else{
-    
-    this.setState({msg:"email or password in valid"})
+  LoginSuperAdmin(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    axios.post("http://localhost:4500/api/login", {
+      email: this.state.email,
+      password: this.state.mdp
+    }).then((res) => {
+      if (res.data.__t === "superadmin") {
+        localStorage.setItem("USER_ROLE", res.data.__t);
+        localStorage.setItem("userId", res.data.id);
+        localStorage.setItem("token", res.data.token);
+        window.location.href = "/homeSuper"; // Redirect after setting localStorage
+      } else {
+        this.setState({ msg: "Email or password invalid" });
+      }
+    }).catch((err) => {
+      console.log(err);
+      this.setState({ msg: "An error occurred. Please try again." });
+    });
   }
-}
-else{
-alert('verifier vos coordonnées')
-}
-  
-  console.log(res);
-})
-}
-// .then((res) =>{
-//   if (res.data.err){
-//     setErreurMsg(res.data.err)
-
-//   }else{
-//     localStorage.setItem("token",res.data.token);
-//     userLoginSuperAdmin(res.data.admin);
-//   }
-//   if (res.data.admin.role===ADMIN){
-//     window.location.href="/";
-//   }
-
-// })
-// .catch ((err)=>
-// console.log (err)
-// )
-   
-
 
   render() {
-  return (
-    <div className="c-app c-default-layout flex-row align-items-center">
-      <CContainer>
-        <CRow className="justify-content-center">
-          <CCol md="8">
-            <CCardGroup>
-              <CCard className="p-4">
-                <CCardBody>
-                  <CForm>
-                    <h1>Connexion</h1>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupPrepend>
-                        <CInputGroupText>
-                          <CIcon name="cil-user" />
-                        </CInputGroupText>
-                      </CInputGroupPrepend>
-                      <CInput type="text" placeholder="email" autoComplete="email" 
-                       onChange={event => this.setState({ email: event.target.value })}  />
-                    </CInputGroup>
-                  
-                    <CInputGroup className="mb-4">
-                      <CInputGroupPrepend>
-                        <CInputGroupText>
-                          <CIcon name="cil-lock-locked" />
-                        </CInputGroupText>
-                      </CInputGroupPrepend>
-                      <CInput type="password" placeholder="Mot de passe" autoComplete="current-mdp" 
-                       onChange={event => this.setState({ mdp: event.target.value })} />
-                    </CInputGroup>
-                    <CRow>
-                    </CRow>
-                    {/* <CLink to="/dashboard"> */}
-                    <CCol col="2" className="text-center mt-3">
-              <CButton type="submit" id="" name="" value="Envoyer"   
-               onClick={(event) => this.LoginSuperAdmin(event)} shape="square" color="light">
-                <CIcon name="cil-lightbulb" />CONNEXION
-              </CButton>
-            </CCol>
-                    {/* </CLink> */}
-                  </CForm>
-                </CCardBody>
-              </CCard>
-            </CCardGroup>
-          </CCol>
-        </CRow>
-      </CContainer>
-      
-    </div>
+    return (
+      <div className="c-app c-default-layout flex-row align-items-center">
+        <CContainer>
+          <CRow className="justify-content-center">
+            <CCol md="8">
+              <CCardGroup>
+                <CCard className="p-4">
+                  <CCardBody>
+                    <CForm onSubmit={(event) => this.LoginSuperAdmin(event)}>
+                      <h1>Connexion</h1>
+                      <CInputGroup className="mb-3">
+                        <CInputGroupPrepend>
+                          <CInputGroupText>
+                            <CIcon name="cil-user" />
+                          </CInputGroupText>
+                        </CInputGroupPrepend>
+                        <CInput
+                          type="text"
+                          placeholder="email"
+                          autoComplete="email"
+                          onChange={event => this.setState({ email: event.target.value })}
+                        />
+                      </CInputGroup>
 
-  )
+                      <CInputGroup className="mb-4">
+                        <CInputGroupPrepend>
+                          <CInputGroupText>
+                            <CIcon name="cil-lock-locked" />
+                          </CInputGroupText>
+                        </CInputGroupPrepend>
+                        <CInput
+                          type="password"
+                          placeholder="Mot de passe"
+                          autoComplete="current-mdp"
+                          onChange={event => this.setState({ mdp: event.target.value })}
+                        />
+                      </CInputGroup>
+                      {this.state.msg && <p>{this.state.msg}</p>}
+                      <CRow>
+                        <CCol col="2" className="text-center mt-3">
+                          <CButton type="submit" shape="square" color="light">
+                            <CIcon name="cil-lightbulb" />CONNEXION
+                          </CButton>
+                        </CCol>
+                      </CRow>
+                    </CForm>
+                  </CCardBody>
+                </CCard>
+              </CCardGroup>
+            </CCol>
+          </CRow>
+        </CContainer>
+      </div>
+    );
+  }
 }
-}
-export default LoginSuperAdmin
+
+export default LoginSuperAdmin;
