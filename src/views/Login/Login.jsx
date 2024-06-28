@@ -8,36 +8,48 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [msg, setMsg] = useState('');
+  const [hastTest, setHasTest] = useState();
 
-  const handleSubmit = (event) => {
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
-    axios.post("http://localhost:4500/api/login", {
-      email: email,
-      password: password
-    }).then((res) => {
-      if (res.data.token) {
+    try {
+      const loginResponse = await axios.post("http://localhost:4500/api/login", {
+        email: email,
+        password: password
+      });
+  
+      if (loginResponse.data.token) {
         // Save the token in localStorage
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userId", res.data.id);
-
-        console.log(res);
-
+        localStorage.setItem("token", loginResponse.data.token);
+        localStorage.setItem("userId", loginResponse.data.id);
+  
+        console.log(loginResponse);
+  
         // Extract user information from the response
-        const userRole = res.data.__t;
-
+        const userRole = loginResponse.data.__t;
+  
         // Save the user role in localStorage if needed
         localStorage.setItem("USER_ROLE", userRole);
-
-        // Redirect based on user role
+  
+        // Fetch the test status
+        const testResponse = await axios.get(`http://localhost:4500/api/getTestByUserId/${localStorage.getItem("userId")}`);
+        const hasTest = testResponse.data; // Assuming the response contains a boolean value
+  
+        setHasTest(hasTest);
+        console.log("Test status:", hasTest);
+  
+        // Redirect based on user role and test status
         if (userRole === "Eleve") {
-          window.location.href = "/DashboardEnseignant";
+          if (hasTest === false) {
+            window.location.href = "/SpeciaitySelect";
+          } else if (hasTest === true) {
+            window.location.href = "/DashboardEleve";
+          }
         } else if (userRole === "admin") {
           window.location.href = "/dashboard";
         } else if (userRole === "Enseignant") {
-          //localStorage.setItem("idAdmin", res.data.data.user.idAdministration);
-          //localStorage.setItem("idUserr", res.data.data.user._id);
-          localStorage.setItem("USER_ROLE", res.data.__t);
+          localStorage.setItem("USER_ROLE", userRole);
           window.location.href = "/DashboardEnseignant";
         } else {
           setMsg("email or password is invalid");
@@ -45,10 +57,10 @@ export default function Login() {
       } else {
         alert('Verifier vos coordonnées');
       }
-    }).catch((err) => {
+    } catch (err) {
       console.error(err);
       setMsg("An error occurred while logging in.");
-    });
+    }
   };
 
   const togglePasswordVisibility = () => {

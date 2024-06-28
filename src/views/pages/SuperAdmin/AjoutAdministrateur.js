@@ -110,6 +110,7 @@ const AjoutAdministrateur = () => {
                       placeholder="Mot de passe"
                       autoComplete="new-password"
                       value={password}
+                      minLength={6}
                       onChange={event => setPassword(event.target.value)}
                     />
                   </CInputGroup>

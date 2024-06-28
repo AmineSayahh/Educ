@@ -38,13 +38,13 @@ class LoginSuperAdmin extends Component {
         localStorage.setItem("USER_ROLE", res.data.__t);
         localStorage.setItem("userId", res.data.id);
         localStorage.setItem("token", res.data.token);
-        window.location.href = "/homeSuper"; // Redirect after setting localStorage
+        window.location.href = "/homeSuper"; 
       } else {
         this.setState({ msg: "Email or password invalid" });
       }
     }).catch((err) => {
       console.log(err);
-      this.setState({ msg: "An error occurred. Please try again." });
+      this.setState({ msg: "Invalid Email and password combination" });
     });
   }
 
@@ -66,7 +66,7 @@ class LoginSuperAdmin extends Component {
                           </CInputGroupText>
                         </CInputGroupPrepend>
                         <CInput
-                          type="text"
+                          type="email"
                           placeholder="email"
                           autoComplete="email"
                           onChange={event => this.setState({ email: event.target.value })}
@@ -83,6 +83,7 @@ class LoginSuperAdmin extends Component {
                           type="password"
                           placeholder="Mot de passe"
                           autoComplete="current-mdp"
+                          minLength={6}
                           onChange={event => this.setState({ mdp: event.target.value })}
                         />
                       </CInputGroup>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios library
 
 const NVTest = () => {
@@ -12,6 +12,22 @@ const NVTest = () => {
   ]);
   const [submitted, setSubmitted] = useState(false);
   const [specialite, setSpecialite] = useState(""); // Add a state for specialite
+  const [specialites, setSpecialites] = useState([]); // Add a state for storing specialties
+
+  useEffect(() => {
+    // Fetch specialties from the API when the component mounts
+    const fetchSpecialites = async () => {
+      try {
+        const groupeId = localStorage.getItem("idG");
+        const response = await axios.get(`http://localhost:4500/api/specialites/${groupeId}`);
+        setSpecialites(response.data);
+      } catch (error) {
+        console.error("Error fetching specialties:", error);
+      }
+    };
+
+    fetchSpecialites();
+  }, []);
 
   const handleQuestionChange = (index, value) => {
     const newQuestions = [...questions];
@@ -92,15 +108,20 @@ const NVTest = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="mb-4">
               <label className="block text-white mb-2" htmlFor="specialite">Spécialité</label>
-              <input
-                type="text"
+              <select
                 id="specialite"
                 value={specialite}
                 onChange={handleSpecialiteChange}
                 className="w-full p-2 rounded-lg"
                 style={{ color: "black" }}
-                placeholder="Écrire la spécialité ici"
-              />
+              >
+                <option value="">Sélectionner une spécialité</option>
+                {specialites.map(specialite => (
+                  <option key={specialite._id} value={specialite._id}>
+                    {specialite.nom}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {questions.map(({ id, question, options, selectedOption }, questionIndex) => (

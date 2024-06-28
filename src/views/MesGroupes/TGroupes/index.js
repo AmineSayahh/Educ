@@ -36,6 +36,20 @@ class TGroupes extends Component {
       console.log(err);
     });
   }
+  getEnseignats() {
+    const token = localStorage.getItem("token");
+    axios.get(`http://localhost:4500/api/FindEns`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((res) => {
+      this.setState({ personnes: res.data });
+      console.log('personnes', this.state.personnes.length);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
 
   HandleclickDelete = (evt, id) => {
     const token = localStorage.getItem("token");
@@ -100,6 +114,8 @@ class TGroupes extends Component {
                       <th>Nom</th>
                       <th>Abbreviation</th>
                       <th>Liste des Matieres</th>
+                      <th>Liste des Enseignants</th>
+                      <th>List des Etudiants</th>
                       <th>Supprimer</th>
                     </tr>
                   </thead>
@@ -115,14 +131,14 @@ class TGroupes extends Component {
                         </td>
                         <td>
                           <CLink to="/MesEnseignantsOutAff/MesEnseignantsOutAff">
-                            <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" onClick={() => this.getGROUPE(item._id)} />
+                            <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" onClick={() => localStorage.setItem("idG", item._id)} />
                           </CLink>
                         </td>
                         <td>
-                          <CLink to="/MesEtudiants/TEtudiants">
-                            <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" onClick={() => this.getGROUPE(item._id)} />
+                          <CLink to="/MesEtudiantall/TEtudiantall">
+                            <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" onClick={() => localStorage.setItem("idG", item._id)} />
                           </CLink>
-                        </td>
+                        </td> 
                         <td>
                           <CIcon name="cil-x" active block shape="pill" color="info" aria-pressed="true" onClick={(evt) => this.HandleclickDelete(evt, item._id)} />
                         </td>

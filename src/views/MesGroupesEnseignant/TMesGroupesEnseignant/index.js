@@ -149,7 +149,8 @@ class MesGroupesEnseignant extends Component {
 
   getGroupes() {
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:4500/api/findAllGroupe`, {
+    const userId = localStorage.getItem('userId');
+    axios.get(`http://localhost:4500/api/groupe/getAll/${userId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -225,7 +226,7 @@ class MesGroupesEnseignant extends Component {
                         <td>
                           <CLink to="/MesEtudiantsEnseignant/TMesEtudiantsEnseignant">
                             <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
-                              <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
+                              <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true"  onClick={() => this.listMat(item._id)} />
                             </CCol>
                           </CLink>
                         </td>

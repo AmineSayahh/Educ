@@ -1,206 +1,235 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } 
-from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
 import {
   CCol,
-  CButton,CLink,
-  CInputFile,CForm,CFormGroup,CLabel,CInput,
-  CDropdownDivider,CDropdown,CDropdownToggle,CDropdownMenu,
-} from '@coreui/react'
+  CButton,
+  CForm,
+  CFormGroup,
+  CLabel,
+  CInput,
+  CDropdownDivider,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CLink
+} from '@coreui/react';
+import CIcon from '@coreui/icons-react';
 
+let prev = 0;
+let next = 0;
+let last = 0;
 
-let prev  = 0;
-let next  = 0;
-let last  = 0;
+class ressourcesEtudiant extends Component {
+  constructor() {
+    super();
+    this.state = {
+      Titre: "",
+      TypeDeCours: "",
+      path: "",
+      personnes: [],
+      currentPage: 1,
+      todosPerPage: 6,
+    };
 
-class ressourcesEtudiants extends Component {
-    constructor() {
-        super();
-        this.state = {
-          Titre:"",
-          DateDeDepotDeCours:"",
-          TypeDeCours:"",
-          Contenu:"",
-          personnes: [],
-          currentPage: 1,
-          todosPerPage: 6,
-        
-        
-          // Files:null
+    this.handleClick = this.handleClick.bind(this);
+    this.handleLastClick = this.handleLastClick.bind(this);
+    this.handleFirstClick = this.handleFirstClick.bind(this);
+  }
 
-        };
-      
-        this.handleClick = this.handleClick.bind(this);
-        
-        this.handleLastClick = this.handleLastClick.bind(this);
-    
-        this.handleFirstClick = this.handleFirstClick.bind(this);
-    
-      }
-     
-      componentDidMount(){
-        this.getusers();
+  componentDidMount() {
+    this.getusers();
+  }
+
+  getusers() {
+    axios.get(`http://localhost:4500/api/getRessources/${localStorage.getItem('idM')}`)
+      .then((res => {
+        this.setState({ personnes: res.data });
+        console.log('personnes', this.state.personnes);
+      }));
+  }
+
+  validate() {
+    let isError = false;
+    const errors = {
+      TitreErr: '',
+      TypeDeCoursErr: '',
+      pathErr: ''
+    };
+
+    if ((this.state.Titre === '')) {
+      isError = true;
+      errors.TitreErr = 'Veuillez verifier votre Titre ';
     }
-   
 
-    getusers(){
-      axios.get(`http://localhost:8000/EspaceDeCours/getAll/${localStorage.getItem('idGroupe')}/${localStorage.getItem('idE')}`).then((res=>{
-            this.setState({personnes:res.data.data})
-            console.log('personnes',this.state.personnes)
-        }))
-
+    if ((this.state.TypeDeCours === '')) {
+      isError = true;
+      errors.TypeDeCoursErr = 'Veuillez verifier votre TypeDeCours ';
     }
- 
 
-      handleClick(event) {
+    if ((this.state.path === '')) {
+      isError = true;
+      errors.pathErr = 'Veuillez verifier votre Contenu';
+    }
 
-        event.preventDefault();
-    
-        this.setState({
-          currentPage: Number(event.target.id)
+    if (isError) {
+      this.setState({
+        ...this.state,
+        ...errors
       });
-      }
-      handleLastClick(event) {
-        event.preventDefault();
-        this.setState({
-          currentPage:last
-        });
-      }
-      handleFirstClick(event) {
-    
-        event.preventDefault();
-    
-        this.setState({
-          currentPage:1
-        });
-      }
-  
-  render() {
-    let {personnes, currentPage, todosPerPage} = this.state;
+    }
+    return isError;
+  }
 
-    // Logic for displaying current todos
+  // envoyer2(e) {
+  //   //let err = this.validate();
+  //   e.preventDefault();
+
+  //   //if (!err) {
+  //     const data = {
+  //       title: this.state.Titre,
+  //       path: this.state.path,
+  //       userId: localStorage.getItem('userId'),
+  //       matiereId: localStorage.getItem('idM')
+  //     };
+
+  //     axios.post(`http://localhost:4500/api/addRessources`, data)
+  //       .then(res => {
+  //         console.log('data', res);
+  //         if (res.data.statut) {
+  //           alert("Cours est ajouté");
+  //           window.location.reload();
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   //}
+  // }
+
+  // HandleclickDelete = (evt, id) => {
+  //   axios.delete(`http://localhost:8000/EspaceDeCours/deleteOne/${id}`).then((res) => {
+  //     console.log('resDel ', id);
+  //     this.getusers();
+  //   });
+  // }
+
+  handleClickEdit(evt, id) {
+    localStorage.setItem("idEspace", id);
+    console.log("idEspace ", localStorage.getItem("idEspace"));
+    window.location.href = "/ressourcesupdate";
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+    this.setState({
+      currentPage: Number(event.target.id)
+    });
+  }
+
+  handleLastClick(event) {
+    event.preventDefault();
+    this.setState({
+      currentPage: last
+    });
+  }
+
+  handleFirstClick(event) {
+    event.preventDefault();
+    this.setState({
+      currentPage: 1
+    });
+  }
+
+  render() {
+    let { personnes, currentPage, todosPerPage } = this.state;
 
     let indexOfLastTodo = currentPage * todosPerPage;
-
     let indexOfFirstTodo = indexOfLastTodo - todosPerPage;
- console.log("indexoflast",indexOfLastTodo);
- console.log("indexfirst",indexOfFirstTodo)
- console.log("persss",personnes)
- let currentTodos =personnes.slice(indexOfFirstTodo, indexOfLastTodo);
+    let currentTodos = personnes.slice(indexOfFirstTodo, indexOfLastTodo);
 
     prev = currentPage > 0 ? (currentPage - 1) : 0;
-
     last = Math.ceil(personnes.length / todosPerPage);
-
     next = (last === currentPage) ? currentPage : currentPage + 1;
 
-
-
-    // Logic for displaying page numbers
-
     let pageNumbers = [];
-
     for (let i = 1; i <= last; i++) {
       pageNumbers.push(i);
     }
 
     return (
       <div className="animated fadeIn">
-        <Row>         
+        <Row>
           <Col xs="12" lg="12">
-            <Card>
-              <CardHeader>
-                {/* <i className="fa fa-align-justify"></i>  */}
-                Les ressources :
-              </CardHeader>
-              <CardBody>
-            
+            <CardBody>
+              <Card>
+                <CardHeader>
+                  <h5>Espace de ressources de cours :</h5>
+                </CardHeader>
                 <Table responsive striped>
                   <thead>
-                  <tr>
-                  <th>Titre </th>
-
-                  <th>Type De Cours </th>
-                   <th>Contenu </th>
-                  <th>Date</th>
-             
-                  </tr>
+                    <tr>
+                      <th>Title</th>
+                      <th>path</th>
+                    </tr>
                   </thead>
                   <tbody>
-                   {
-                  currentTodos.map((item,index) =>{
-                                    return(
-              
-                                      <tr 
-                                      key={index}>
-                                          
-                                          <td>{item.Titre}</td>
-                                       <td>{item.TypeDeCours}</td>
-                                       {/* <td>{item.Contenu}</td>        */}
-                               
-                                       <CLink to={`/${item.Files}`} target="_blank" download>{item.Files}</CLink>
-                                       <td>{item.DateDeDepotDeCours}</td>
-                                           
-                                    </tr>
-                                    );
-              
-                                  })
-                            }
-                  
-                        </tbody>
-                                            
+                    {
+                      currentTodos.map((item, index) => {
+                        return (
+                          <tr key={index}>
+                            <td>{item.title}</td>
+                            <td>{item.path}</td>
+                          </tr>
+                        );
+                      })
+                    }
+                  </tbody>
                 </Table>
                 <nav>
-     <Pagination>
-
-      <PaginationItem>
-        { prev === 0 ? <PaginationLink disabled>First</PaginationLink> :
-          <PaginationLink onClick={this.handleFirstClick} id={prev} href={prev}>First</PaginationLink>
-        }
-      </PaginationItem>
-      <PaginationItem>
-        { prev === 0 ? <PaginationLink disabled>Prev</PaginationLink> :
-          <PaginationLink onClick={this.handleClick} id={prev} href={prev}>Prev</PaginationLink>
-        }
-      </PaginationItem>
-      {
-        pageNumbers.map((number,i) =>
-          <Pagination key= {i}>
-            <PaginationItem active = {pageNumbers[currentPage-1] === (number) ? true : false} >
-              <PaginationLink onClick={this.handleClick} href={number} key={number} id={number}>
-                {number}
-              </PaginationLink>
-            </PaginationItem>
-          </Pagination>
-        )}
-
-      <PaginationItem>
-        {
-          currentPage === last ? <PaginationLink disabled>Next</PaginationLink> :
-            <PaginationLink onClick={this.handleClick} id={pageNumbers[currentPage]} href={pageNumbers[currentPage]}>Next</PaginationLink>
-        }
-      </PaginationItem>
-
-      <PaginationItem>
-        {
-          currentPage === last ? <PaginationLink disabled>Last</PaginationLink> :
-            <PaginationLink onClick={this.handleLastClick} id={pageNumbers[currentPage]} href={pageNumbers[currentPage]}>Last</PaginationLink>
-        }
-      </PaginationItem>
-    </Pagination>
-  </nav>
- 
-               </CardBody>
-            </Card>
-          
+                  <Pagination>
+                    <PaginationItem>
+                      {prev === 0 ? <PaginationLink disabled>First</PaginationLink> :
+                        <PaginationLink onClick={this.handleFirstClick} id={prev} href={prev}>First</PaginationLink>
+                      }
+                    </PaginationItem>
+                    <PaginationItem>
+                      {prev === 0 ? <PaginationLink disabled>Prev</PaginationLink> :
+                        <PaginationLink onClick={this.handleClick} id={prev} href={prev}>Prev</PaginationLink>
+                      }
+                    </PaginationItem>
+                    {
+                      pageNumbers.map((number, i) =>
+                        <Pagination key={i}>
+                          <PaginationItem active={pageNumbers[currentPage - 1] === (number) ? true : false} >
+                            <PaginationLink onClick={this.handleClick} href={number} key={number} id={number}>
+                              {number}
+                            </PaginationLink>
+                          </PaginationItem>
+                        </Pagination>
+                      )
+                    }
+                    <PaginationItem>
+                      {
+                        currentPage === last ? <PaginationLink disabled>Next</PaginationLink> :
+                          <PaginationLink onClick={this.handleClick} id={pageNumbers[currentPage]} href={pageNumbers[currentPage]}>Next</PaginationLink>
+                      }
+                    </PaginationItem>
+                    <PaginationItem>
+                      {
+                        currentPage === last ? <PaginationLink disabled>Last</PaginationLink> :
+                          <PaginationLink onClick={this.handleLastClick} id={pageNumbers[currentPage]} href={pageNumbers[currentPage]}>Last</PaginationLink>
+                      }
+                    </PaginationItem>
+                  </Pagination>
+                </nav>
+              </Card>
+            </CardBody>
           </Col>
-            
-        </Row>  
+        </Row>
       </div>
-
     );
   }
 }
 
-export default ressourcesEtudiants;
+export default ressourcesEtudiant;

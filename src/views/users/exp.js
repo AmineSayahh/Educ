@@ -12,12 +12,6 @@ class ListUtilisateur extends Component {
           Personel: [],
           currentPage: 1,
           todosPerPage: 6,
-
-
-
-    
-          
-    
         };
     
         this.handleClick = this.handleClick.bind(this);
