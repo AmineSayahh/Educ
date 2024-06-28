@@ -36,11 +36,9 @@ export default function Signup() {
 
       console.log("Response:", response);
 
-      // Assuming successful registration redirects to login page
       history.push("/login");
     } catch (error) {
       console.error("Error registering user:", error);
-      // Handle error, show user-friendly message if needed
     }
   };
 

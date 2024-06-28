@@ -4,7 +4,6 @@ import {
   CButton,
   CCard,
   CCardBody,
-  CLink,
   CCol,
   CContainer,
   CForm,
@@ -12,98 +11,107 @@ import {
   CInputGroup,
   CInputGroupPrepend,
   CInputGroupText,
-  CRow
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
+  CRow,
+  CLink
+} from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import Select from 'react-select';
 
-
-class AjoutMatiere  extends Component {
-  constructor(){
-    super()
-    this.state={
-        nom:""
-        
-    }}
-
-  componentDidMount(){
-        this.getusers();
+class AjouterMatiere extends Component {
+  constructor() {
+    super();
+    this.state = {
+      nomMatiere: '',
+      selectedGroupes: [], // Change to an array for multi-select
+      groupes: []
     };
-getusers(){
- axios.get(`http://localhost:4000/api/enseignants`)
-  .then((res=>{
-      this.setState({personnes:res.data})
-      console.log('personnes',this.state.personnes)
-      this.setState({long:res.data.data.length}) 
-     
-        }))}
-envoyer(){
-console.log('clicked')
+  }
 
-  const fd = new FormData();
-  
-  fd.append('nom',this.state.nom)
-  
-    // const data2 ={nom:this.state.nom,
-    //   prenom:this.state.prenom,email:this.state.email,password:this.state.password,statut:this.state.statut
-    // }
-  
-  
-  
-  axios.post(`http://localhost:8000/Enseignant/addEnseignant/${localStorage.getItem('idUser')}`,fd)
-    .then(res=>{
-        console.log('dataaaaaaaaaaaaaaaaaaaaaa',res)
-        if(this.state.long != res.data.data.lenght){
-          console.log(res.data.data.password)
-          const mot=res.data.data.password
-          // alert(`Compte enseignant est créé et son mot de passe est : ${res.data.password}`)
-      alert('Enseignant est créé et son mot de passe est :'+ '  '+mot)
-            }
-            window.location.reload()
-      //  window.location.href='/sidebar'
-    })
-    .catch((err)=>{
-        console.log(err)
-    })
-     
-}
+  componentDidMount() {
+    this.getGroupes();
+  }
 
+  getGroupes() {
+    const token = localStorage.getItem("token");
+    axios
+      .get(`http://localhost:4500/api/findAllGroupe`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => {
+        const groupes = res.data.map(groupe => ({ value: groupe._id, label: groupe.NomDeGroupe }));
+        this.setState({ groupes });
+      })
+      .catch(error => {
+        console.error('Error fetching groupes:', error);
+      });
+  }
 
-render() {
-  return (
-    <div className="c-app c-default-layout flex-row align-items-center">
+  envoyer() {
+    const data = {
+      nom: this.state.nomMatiere,
+      groupeId: this.state.selectedGroupes.map(groupe => groupe.value) // Extract IDs from selected groups
+    };
+
+    axios
+      .post(`http://localhost:4500/api/specialites`, data)
+      .then(res => {
+        alert('Matière créée');
+        window.location.reload();
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  render() {
+    const { groupes } = this.state;
+
+    return (
       <CContainer>
-        <CRow className="justify-content-center">
-          <CCol md="9" lg="7" xl="6">
-            <CCard className="mx-4">
-              <CCardBody className="p-4">
-                <CForm>
-                  <h1>Ajouter une matiére</h1>
-                  <p className="text-muted">Ajouter une matiére</p>
-                  <CInputGroup className="mb-3">
-                    <CInputGroupPrepend>
-                      <CInputGroupText>
-                        <CIcon name="cil-user" />
-                      </CInputGroupText>
-                    </CInputGroupPrepend>
-                    <CInput type="text" placeholder="Nom" autoComplete="Nom" onChange={event=>this.setState({nom:event.target.value})}></CInput>
-                  </CInputGroup>
-            {/* <CLink to="/MesEnseignantsOutAff"> */}
-                  <CButton color="btn btn-light" block type="submit"  onClick={()=>{this.envoyer()}}>Ajouter une matiére</CButton>
-                  {/* <CButton color="primary" block type="submit"  onClick={()=>{this.envoyer()}}>Ajouter </CButton> */}
+        <CCard className="mx-4">
+          <CCardBody className="p-4">
+            <CForm>
+              <h1>Matiere</h1>
+              <p className="text-muted">Ajouter une matiere</p>
+              <CInputGroup className="mb-3">
+                <CInputGroupPrepend>
+                  <CInputGroupText>
+                    <CIcon name="cil-list" />
+                  </CInputGroupText>
+                </CInputGroupPrepend>
+                <CInput
+                  type="text"
+                  placeholder="Nom"
+                  autoComplete="Nom"
+                  onChange={event => this.setState({ nomMatiere: event.target.value })}
+                />
+              </CInputGroup>
 
-                  {/* </CLink> */}
-                   </CForm>
-                
-                   </CCardBody>
-             
-           
-            
-            </CCard>
-          </CCol>
-        </CRow>
+              <CInputGroup className="mb-3">
+                <CInputGroupPrepend>
+                  <CInputGroupText>Groupes</CInputGroupText>
+                </CInputGroupPrepend>
+                <Select
+                  isMulti
+                  options={groupes}
+                  onChange={selectedGroupes => this.setState({ selectedGroupes })}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                />
+              </CInputGroup>
+
+              <CButton color="btn btn-light" block type="button" onClick={() => this.envoyer()}>
+                Ajouter
+              </CButton>
+            </CForm>
+          </CCardBody>
+        </CCard>
       </CContainer>
-    </div>
-  )
+    );
+  }
 }
-}
-export default AjoutMatiere;
+
+export default AjouterMatiere;

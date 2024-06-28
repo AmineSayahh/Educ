@@ -12,20 +12,82 @@ import {
   CForm,
   CRow,
   CCol
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
+} from '@coreui/react';
+import CIcon from '@coreui/icons-react';
 
 class AjoutEnseignant extends Component {
   constructor() {
-    super()
+    super();
     this.state = {
       nom: "",
       prenom: "",
       email: "",
       password: "",
-      specialite: [], // Change to array for multiple specialties
-      long: ""
+      groupes: [], // To store the list of groupes
+      selectedGroupes: [], // To store the selected groupes and their specialities
+    };
+  }
+
+  componentDidMount() {
+    const token = localStorage.getItem("token");
+    axios.get('http://localhost:4500/api/findAllGroupe', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        this.setState({ groupes: res.data });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  fetchSpecialities(groupeId) {
+    const token = localStorage.getItem("token");
+    return axios.get(`http://localhost:4500/api/specialites/${groupeId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.data)
+      .catch(err => {
+        console.log(err);
+        return [];
+      });
+  }
+
+  async handleCheckboxChange(groupeId) {
+    const isSelected = this.state.selectedGroupes.some(group => group.groupeId === groupeId);
+    let newSelectedGroupes;
+
+    if (isSelected) {
+      newSelectedGroupes = this.state.selectedGroupes.filter(group => group.groupeId !== groupeId);
+    } else {
+      const specialities = await this.fetchSpecialities(groupeId);
+      newSelectedGroupes = [...this.state.selectedGroupes, { groupeId, specialities, selectedSpecialities: [] }];
     }
+
+    this.setState({ selectedGroupes: newSelectedGroupes });
+  }
+
+  handleSpecialityChange(groupeId, specialityId) {
+    const newSelectedGroupes = this.state.selectedGroupes.map(group => {
+      if (group.groupeId === groupeId) {
+        const isSelected = group.selectedSpecialities.includes(specialityId);
+        return {
+          ...group,
+          selectedSpecialities: isSelected
+            ? group.selectedSpecialities.filter(id => id !== specialityId)
+            : [...group.selectedSpecialities, specialityId]
+        };
+      }
+      return group;
+    });
+
+    this.setState({ selectedGroupes: newSelectedGroupes });
   }
 
   envoyer() {
@@ -34,11 +96,14 @@ class AjoutEnseignant extends Component {
       prenom: this.state.prenom,
       email: this.state.email,
       password: this.state.password,
-      specialite: this.state.specialite,
+      enseigne: this.state.selectedGroupes.map(group => ({
+        GroupeEns: group.groupeId,
+        specialite: group.selectedSpecialities
+      })),
       repeat_password: this.state.password
     };
 
-    axios.post(`http://localhost:4500/api/enseignants`, data)
+    axios.post('http://localhost:4500/api/enseignants', data)
       .then(res => {
         console.log('Response:', res);
         if (res.data) {
@@ -51,7 +116,7 @@ class AjoutEnseignant extends Component {
           prenom: "",
           email: "",
           password: "",
-          specialite: []
+          selectedGroupes: [],
         });
       })
       .catch(err => {
@@ -127,20 +192,35 @@ class AjoutEnseignant extends Component {
                       />
                     </CInputGroup>
 
-                    <CInputGroup className="mb-3">
-                      <CInputGroupPrepend>
-                        <CInputGroupText>
-                          <CIcon name="cilCheck" />
-                        </CInputGroupText>
-                      </CInputGroupPrepend>
-                      <CInput
-                        type="text"
-                        placeholder="Spécialités (séparées par des virgules)"
-                        autoComplete="specialite"
-                        value={this.state.specialite}
-                        onChange={event => this.setState({ specialite: event.target.value })}
-                      />
-                    </CInputGroup>
+                    <div className="mb-3">
+                      <h5>Groupes</h5>
+                      {this.state.groupes.map(groupe => (
+                        <div key={groupe._id}>
+                          <input
+                            type="checkbox"
+                            id={groupe._id}
+                            value={groupe._id}
+                            onChange={() => this.handleCheckboxChange(groupe._id)}
+                          />
+                          <label htmlFor={groupe._id}>{groupe.NomDeGroupe}</label>
+                          {this.state.selectedGroupes.some(group => group.groupeId === groupe._id) && (
+                            <div style={{ marginLeft: "20px" }}>
+                              {this.state.selectedGroupes.find(group => group.groupeId === groupe._id).specialities.map(speciality => (
+                                <div key={speciality._id}>
+                                  <input
+                                    type="checkbox"
+                                    id={speciality._id}
+                                    value={speciality._id}
+                                    onChange={() => this.handleSpecialityChange(groupe._id, speciality._id)}
+                                  />
+                                  <label htmlFor={speciality._id}>{speciality.nom}</label>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
 
                     <CButton color="btn btn-light" block type="button" onClick={() => this.envoyer()}>
                       Ajouter un enseignant
@@ -152,7 +232,7 @@ class AjoutEnseignant extends Component {
           </CRow>
         </CContainer>
       </div>
-    )
+    );
   }
 }
 

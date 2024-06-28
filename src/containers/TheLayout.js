@@ -1,28 +1,44 @@
-import React from 'react'
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
+import routes from '../routes';
+import PrivateRoute from '../PrivateRoute';
 import {
   TheContent,
   TheSidebar,
   TheFooter,
   TheHeader
-} from './index'
+} from './index';
 
 const TheLayout = () => {
-
   return (
     <div className="c-app c-default-layout">
       <TheSidebar/>
       <div className="c-wrapper">
         <TheHeader/>
         <div className="c-body">
-          <TheContent/>
+          <Switch>
+            {routes.map((route, idx) => {
+              return route.component ? (
+                <PrivateRoute
+                  key={idx}
+                  path={route.path}
+                  exact={route.exact}
+                  name={route.name}
+                  component={route.component}
+                />
+              ) : null;
+            })}
+            <Route render={() => <h1>Not found</h1>} />
+          </Switch>
         </div>
         <TheFooter/>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TheLayout
+export default TheLayout;
+
 // import React, { Component } from "react";
 // import { Layout, Menu, Row, Breadcrumb, Affix } from "antd";
 // import {

@@ -53,35 +53,35 @@ class Dashboard extends Component {
   envoyer() {
     console.log('title', this.state.title);
     console.log('description', this.state.description);
-    
+
     const token = localStorage.getItem('token');
     const payload = {
       title: this.state.title,
       description: this.state.description
     };
-  
+
     axios.post('http://localhost:4500/api/posts', payload, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
-    .then(res => {
-      console.log('data', res);
-      if (res.status === 200) {
-        alert('Publication est ajoutée');
-      }
-      window.location.reload();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+      .then(res => {
+        console.log('data', res);
+        if (res.status === 200) {
+          alert('Publication est ajoutée');
+        }
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   getUsers() {
     const token = localStorage.getItem('token');
-  
-    axios.get('http://localhost:4500/api/posts', {
+
+    axios.get(`http://localhost:4500/api/getPosts/${localStorage.getItem("userId")}`  , {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ class Dashboard extends Component {
   render() {
     return (
       <>
-<CRow>
+        <CRow>
           <CCol xxxxs="0.000000000000000000000000000000000000000000000000000000000000001" xxxxl="0.000000000000000000000000000000000000000000000000000000000000001">
             <CCard>
               {/* <CCardHeader>
@@ -239,7 +239,7 @@ export default Dashboard;
 // } from '@coreui/react'
 // import CIcon from '@coreui/icons-react'
 
-// import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } 
+// import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table }
 // from 'reactstrap';
 // let prev  = 0;
 // let next  = 0;
@@ -377,7 +377,7 @@ export default Dashboard;
 //         <CCard>
 
 //               <CardHeader>
-//                 <i className="fa fa-align-justify"></i> 
+//                 <i className="fa fa-align-justify"></i>
 //             Publications Administratives
 //               </CardHeader>
 //               <CardBody>
@@ -394,11 +394,11 @@ export default Dashboard;
 //                                  currentTodos.map((item,index) =>{
 //                                     return(
 
-//                                       <tr 
+//                                       <tr
 //                                       key={index}>
-//                                           <p>{item.Contenu}</p> 
-//                                           <p>{item.DateDeCreation}</p> 
-//                                           <p>{item.Files}</p> 
+//                                           <p>{item.Contenu}</p>
+//                                           <p>{item.DateDeCreation}</p>
+//                                           <p>{item.Files}</p>
 
 //                                             {/* <td>
 
@@ -420,7 +420,7 @@ export default Dashboard;
 //                                      {/* <td>
 //                                      <CLink to="/MesEnseignants/MesEnseignants">
 //                 <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-//                 <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+//                 <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 //                  type="submit"  onClick={()=>{this.envoyer2()}}
 //             </CCol>
 //             </CLink>
@@ -430,7 +430,7 @@ export default Dashboard;
 //                     //                           <td>
 //                     //                           <CLink to="/Dashboard">
 //                     //      <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-//                     //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+//                     //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 //                     //       {/* type="submit"  onClick={()=>{this.envoyer2()}} */}
 //                     //  </CCol>
 //                     //  </CLink>
@@ -493,9 +493,9 @@ export default Dashboard;
 //                     <CLabel htmlFor="textarea-input">Ecrivez ...</CLabel>
 //                   </CCol>
 //                   <CCol xs="12" md="9">
-//                     <CTextarea 
-//                       name="textarea-input" 
-//                       id="textarea-input" 
+//                     <CTextarea
+//                       name="textarea-input"
+//                       id="textarea-input"
 //                       rows="9"
 //                       placeholder="Content..." onChange={event=>this.setState({Contenu:event.target.value})}
 //                     />
@@ -519,7 +519,7 @@ export default Dashboard;
 //         </CCardBody>
 //         </CCardHeader>
 
-//         </CCard>   
+//         </CCard>
 
 //     )
 // }}
@@ -551,7 +551,7 @@ export default Dashboard;
 // // } from '@coreui/react'
 
 
-// // import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } 
+// // import {  Card, CardBody,CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table }
 // // from 'reactstrap';
 // // import CIcon from '@coreui/icons-react'
 
@@ -1094,11 +1094,11 @@ export default Dashboard;
 // //     </>
 // //   )
 // // }
-// // <div> 
+// // <div>
 // // <CCard>
 
 // //       <CardHeader>
-// //         <i className="fa fa-align-justify"></i> 
+// //         <i className="fa fa-align-justify"></i>
 // //     Publications Administratives
 // //       </CardHeader>
 // //       <CardBody>
@@ -1115,11 +1115,11 @@ export default Dashboard;
 // //                          currentTodos.map((item,index) =>{
 // //                             return(
 
-// //                               <tr 
+// //                               <tr
 // //                               key={index}>
-// //                                   <p>{item.Contenu}</p> 
-// //                                   <p>{item.DateDeCreation}</p> 
-// //                                   <p>{item.Files}</p> 
+// //                                   <p>{item.Contenu}</p>
+// //                                   <p>{item.DateDeCreation}</p>
+// //                                   <p>{item.Files}</p>
 
 // //                                     {/* <td>
 
@@ -1141,7 +1141,7 @@ export default Dashboard;
 // //                              {/* <td>
 // //                              <CLink to="/MesEnseignants/MesEnseignants">
 // //         <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-// //         <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+// //         <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 // //          type="submit"  onClick={()=>{this.envoyer2()}}
 // //     </CCol>
 // //     </CLink>
@@ -1151,7 +1151,7 @@ export default Dashboard;
 // //             //                           <td>
 // //             //                           <CLink to="/Dashboard">
 // //             //      <CCol col="6" sm="4" md="2" xl className="mb-3 mb-xl-0" >
-// //             //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" /> 
+// //             //      <CIcon name="cil-chevron-right" active block shape="pill" color="info" aria-pressed="true" />
 // //             //       {/* type="submit"  onClick={()=>{this.envoyer2()}} */}
 // //             //  </CCol>
 // //             //  </CLink>
@@ -1214,9 +1214,9 @@ export default Dashboard;
 // //             <CLabel htmlFor="textarea-input">Ecrivez ...</CLabel>
 // //           </CCol>
 // //           <CCol xs="12" md="9">
-// //             <CTextarea 
-// //               name="textarea-input" 
-// //               id="textarea-input" 
+// //             <CTextarea
+// //               name="textarea-input"
+// //               id="textarea-input"
 // //               rows="9"
 // //               placeholder="Content..." onChange={event=>this.setState({Contenu:event.target.value})}
 // //             />
@@ -1230,12 +1230,12 @@ export default Dashboard;
 // //             </CInputGroupPrepend>
 // //             <CInput type="text" placeholder="Date de creation" autoComplete="DateDeCreation" onChange={event=>this.setState({DateDeCreation:event.target.value})}></CInput>
 // //           </CInputGroup> */}
-// //         {/* <CInputGroup  className="mb-3">  
+// //         {/* <CInputGroup  className="mb-3">
 
 // //           <CInputGroupPrepend><label for="Télécharger Un Fichier">Télécharger un fichier : .. </label>
 
 // //    <input type="file" placeholder="Télécharger un fichier"    onChange={event=>this.setState({Files:event.target.files[0]})} />
-// //    </CInputGroupPrepend>  
+// //    </CInputGroupPrepend>
 // //     </CInputGroup > */}
 // //          <CFormGroup row>
 // //           <CLabel col md="3" htmlFor="file-input">Ajouter des fichier à votre publication</CLabel>
@@ -1254,7 +1254,7 @@ export default Dashboard;
 // // </CCardBody>
 // // </CCardHeader>
 
-// // </CCard>   
+// // </CCard>
 // // </div>
 
 // // export default Dashboard
